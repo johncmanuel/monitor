@@ -1,0 +1,3 @@
+{
+    "rust-analyzer.linkedProjects": ["tracker\\src-tauri\\Cargo.toml"]
+}

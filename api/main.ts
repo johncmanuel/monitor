@@ -13,7 +13,6 @@ const handler = async (request: Request): Promise<Response> => {
   return new Response("Not found", { status: 404 });
 }
 
-
 if (import.meta.main) {
   console.log("Starting server...");
   Deno.serve({
