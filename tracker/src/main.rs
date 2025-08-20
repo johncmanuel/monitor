@@ -4,8 +4,10 @@ use std::sync::{Arc, Mutex};
 use std::{mem, thread};
 use std::time::Duration;
 use reqwest;
+use ts_rs::TS;
 
-#[derive(Serialize, Clone, Debug, Default)]
+#[derive(Serialize, Clone, Debug, Default, TS)]
+#[ts(export)]
 struct Data {
     keypresses: u64,
     left_clicks: u64,
