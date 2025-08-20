@@ -2,10 +2,10 @@ use rdev::{listen, Button, Event, EventType};
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use std::{mem, thread};
+use std::{mem};
 use tauri::async_runtime::spawn;
 use tauri::{Manager, State};
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock};
 use ts_rs::TS;
 
 // in the future, i'll include more types of events
@@ -46,14 +46,17 @@ pub fn run() {
     let data_clone = data.clone();
 
     // create new thread for event listening
-    thread::spawn(move || {
-        listen(move |event| callback(event, &data_clone)).expect("Could not listen to events");
-    });
+    // thread::spawn(move || {
+    //     listen(move |event| callback(event, &data_clone)).expect("Could not listen to events");
+    // });
 
     tauri::Builder::default()
         .setup(|app| {
             let app_handle = app.handle().clone();
             spawn(run_tracker(app_handle));
+            spawn(async move {
+                listen(move |event| callback(event, &data_clone)).expect("Could not listen to events");
+            });
             Ok(())
         })
         .manage(RwLock::new(Config {
@@ -65,8 +68,8 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
         .run(|_app_handle, event| match event {
-            tauri::RunEvent::ExitRequested { api, .. } => {
-                api.prevent_exit();
+            tauri::RunEvent::ExitRequested { .. } => {
+                println!("Exit requested. Sending shutdown signal...");
             }
             _ => {}
         });
