@@ -2,33 +2,35 @@ use rdev::{listen, Event, EventType, Button};
 use serde::Serialize;
 use std::sync::{Arc, Mutex};
 use std::{mem, thread};
-use std::time::Duration;
+use tokio;
 use reqwest;
 use ts_rs::TS;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+
+// in the future, i'll include more types of events
 #[derive(Serialize, Clone, Debug, Default, TS)]
-#[ts(export)]
+#[ts(export, export_to = "../../api/types/data.d.ts")]
 struct Data {
+    timestamp: u64,
     keypresses: u64,
     left_clicks: u64,
     right_clicks: u64,
     middle_clicks: u64,
-    scrolls: u64,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let data = Arc::new(Mutex::new(Data::default()));
     let data_clone = Arc::clone(&data);
 
     let client = reqwest::Client::new();
-    let api_url = "http://localhost:8000"; 
+    const API_URL: &str = "http://localhost:8000/tracker";
 
     // create new thread for event listening
     thread::spawn(move || {
         listen(move |event| callback(event, &data_clone)).expect("Could not listen for events");
     });
-
-    println!("Listening for events...");
 
     // gonna set this to 10 mins? for capturing, then send it to the API
     // let interval_length_secs = 60 * 10;
@@ -36,23 +38,21 @@ fn main() {
 
     loop {
         thread::sleep(Duration::from_secs(interval_length_secs));
-        let data_snapshot = {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        let mut data_snapshot = {
             let mut data_guard = data.lock().unwrap();
             mem::replace(&mut *data_guard, Data::default())
         };
+        data_snapshot.timestamp = now;
         let total_events = data_snapshot.keypresses
             + data_snapshot.left_clicks
             + data_snapshot.right_clicks
-            + data_snapshot.middle_clicks
-            + data_snapshot.scrolls;
+            + data_snapshot.middle_clicks;
         if total_events > 0 {
-            // wonder if there's a logger based on environment (dev, prod, etc.)
-            println!("Events in the last {} seconds:", interval_length_secs);
-            println!("Key presses: {}", data_snapshot.keypresses);
-            println!("Left clicks: {}", data_snapshot.left_clicks);
-            println!("Right clicks: {}", data_snapshot.right_clicks);
-            println!("Middle clicks: {}", data_snapshot.middle_clicks);
-            println!("Scrolls: {}", data_snapshot.scrolls);
+            send_to_api(&client, data_snapshot, API_URL).await;
         } else {
             println!("No events in the last {} seconds.", interval_length_secs);
         }
@@ -78,10 +78,7 @@ fn callback(event: Event, data_tmp: &Arc<Mutex<Data>>) {
             // skip other events
             _ => ()
         }
-        EventType::Wheel { delta_x: _, delta_y: _ } => {
-            data.scrolls += 1;
-        }
-        // skip other events
+       // skip other events
         _ => ()
     }
 }
