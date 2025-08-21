@@ -4,6 +4,7 @@
     "npm:@tauri-apps/api@2": "2.8.0",
     "npm:@tauri-apps/cli@2": "2.8.1",
     "npm:@tauri-apps/plugin-opener@2": "2.5.0",
+    "npm:@tauri-apps/plugin-store@2.4": "2.4.0",
     "npm:typescript@~5.6.2": "5.6.3",
     "npm:vite@^6.0.3": "6.3.5_picomatch@4.0.3"
   },
@@ -319,6 +320,12 @@
         "@tauri-apps/api"
       ]
     },
+    "@tauri-apps/plugin-store@2.4.0": {
+      "integrity": "sha512-PjBnlnH6jyI71MGhrPaxUUCsOzc7WO1mbc4gRhME0m2oxLgCqbksw6JyeKQimuzv4ysdpNO3YbmaY2haf82a3A==",
+      "dependencies": [
+        "@tauri-apps/api"
+      ]
+    },
     "@types/estree@1.0.8": {
       "integrity": "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w=="
     },
@@ -453,6 +460,7 @@
         "npm:@tauri-apps/api@2",
         "npm:@tauri-apps/cli@2",
         "npm:@tauri-apps/plugin-opener@2",
+        "npm:@tauri-apps/plugin-store@2.4",
         "npm:typescript@~5.6.2",
         "npm:vite@^6.0.3"
       ]
