@@ -2,13 +2,11 @@ mod config;
 mod listener;
 mod tracker;
 
-use rdev::listen;
 use std::sync::{Arc, Mutex};
-use std::thread;
 use tauri::async_runtime::spawn;
 use tokio::sync::RwLock;
 use crate::config::{Config, get_config, update_config};
-use crate::listener::{Data, run_listener};
+use crate::listener::{Data, start_listener};
 use crate::tracker::run_tracker;
 
 
@@ -21,12 +19,8 @@ pub fn run() {
         .setup(|app| {
             let app_handle = app.handle().clone();
             spawn(run_tracker(app_handle));
-
-            thread::spawn(move || {
-                listen(move |event| run_listener(event, &data_clone))
-                    .expect("Could not listen to events");
-            });
-           Ok(())
+            start_listener(data_clone);
+          Ok(())
         })
         .manage(RwLock::new(Config {
             api_url: "http://localhost:8000/tracker".to_string(),
