@@ -33,58 +33,64 @@ function setTrackingState(isRunning: boolean) {
   }
 }
 
-if (form && apiUrlInput && intervalInput && statusEl) {
-  startButton.addEventListener("click", async () => {
-    await invoke("start_tracking");
-    setTrackingState(true);
-  });
-
-  stopButton.addEventListener("click", async () => {
-    await invoke("stop_tracking");
-    setTrackingState(false);
-  });
-
-  globalThis.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const config = await invoke<Config>("get_config");
-      apiUrlInput.value = config.api_url;
-      intervalInput.value = String(config.interval_secs);
-    } catch (e) {
-      console.error("Error loading config:", e);
-      statusEl.textContent = "Error loading config.";
-      statusEl.style.color = "red";
-    }
-  });
-
-  form.addEventListener("submit", async (event: SubmitEvent) => {
-    event.preventDefault();
-
-    const newConfig: Config = {
-      api_url: apiUrlInput.value,
-      // TODO: rust expects a u64 or BigInt but it doesn't know how to serialize it.
-      // could be an issue with ts-rs, so may need to check it out
-      interval_secs: parseInt(intervalInput.value, 10) as unknown as bigint,
-    };
-
-    try {
-      await invoke("update_config", { newConfig });
-      store.set("config", newConfig);
-      statusEl.textContent = "Settings saved successfully!";
-      statusEl.style.color = "green";
-    } catch (e) {
-      console.error("Error saving config:", e);
-      statusEl.textContent = "Failed to save settings.";
-      statusEl.style.color = "red";
-    }
-
-    setTimeout(() => {
-      if (statusEl) {
-        statusEl.textContent = "";
-      }
-    }, 3000);
-  });
-} else {
+if (!form || !apiUrlInput || !intervalInput || !statusEl) {
   console.error(
     "Initialization failed: One or more required HTML elements were not found.",
   );
 }
+
+async function loadConfig() {
+  try {
+    await invoke<Config>("get_config");
+    const config = await store.get<Config>("config");
+    if (config) {
+      console.log("Loaded config:", config);
+      apiUrlInput!.value = config.api_url;
+      intervalInput!.value = String(config.interval_secs);
+    }
+  } catch (e) {
+    console.error("Error loading config:", e);
+    statusEl!.textContent = "Error loading config.";
+    statusEl!.style.color = "red";
+  }
+}
+
+await loadConfig();
+
+startButton.addEventListener("click", async () => {
+  await invoke("start_tracking");
+  setTrackingState(true);
+});
+
+stopButton.addEventListener("click", async () => {
+  await invoke("stop_tracking");
+  setTrackingState(false);
+});
+
+form!.addEventListener("submit", async (event: SubmitEvent) => {
+  event.preventDefault();
+
+  const newConfig: Config = {
+    api_url: apiUrlInput!.value,
+    // TODO: rust expects a u64 or BigInt but it doesn't know how to serialize it.
+    // could be an issue with ts-rs, so may need to check it out
+    interval_secs: parseInt(intervalInput!.value, 10) as unknown as bigint,
+  };
+
+  try {
+    await invoke("update_config", { newConfig });
+    store.set("config", newConfig);
+    statusEl!.textContent = "Settings saved successfully!";
+    statusEl!.style.color = "green";
+  } catch (e) {
+    console.error("Error saving config:", e);
+    statusEl!.textContent = "Failed to save settings.";
+    statusEl!.style.color = "red";
+  }
+
+  setTimeout(() => {
+    if (statusEl) {
+      statusEl!.textContent = "";
+    }
+  }, 3000);
+});
