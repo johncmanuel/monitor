@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Config } from "./types/config.d.ts";
+import { store } from "./store.ts";
 
 const form = document.getElementById("configForm") as HTMLFormElement | null;
 const apiUrlInput = document.getElementById("apiUrl") as
@@ -67,6 +68,7 @@ if (form && apiUrlInput && intervalInput && statusEl) {
 
     try {
       await invoke("update_config", { newConfig });
+      store.set("config", newConfig);
       statusEl.textContent = "Settings saved successfully!";
       statusEl.style.color = "green";
     } catch (e) {
