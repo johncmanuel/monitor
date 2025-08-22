@@ -29,12 +29,12 @@ pub async fn run_tracker(app_handle: tauri::AppHandle) {
             let mut data_guard = counter_state.lock().unwrap();
             mem::replace(&mut *data_guard, Data::default())
         };
-        data_snapshot.timestamp = now;
+        data_snapshot.ts = now;
 
-        let total_events = data_snapshot.keypresses
-            + data_snapshot.left_clicks
-            + data_snapshot.right_clicks
-            + data_snapshot.middle_clicks;
+        let total_events = data_snapshot.kp
+            + data_snapshot.lc
+            + data_snapshot.rc
+            + data_snapshot.mc;
 
         if total_events > 0 {
             let url = config_state.read().await.api_url.clone();

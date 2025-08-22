@@ -1,5 +1,5 @@
 import { Data } from "../types/data.d.ts";
-import { kv } from "../src/kv.ts";
+import { storeTrackerData } from "../src/kv.ts";
 
 type EndpointHandler = (request: Request) => Promise<Response>;
 
@@ -18,11 +18,6 @@ export const trackerHandler: EndpointHandler = async (request) => {
   }
   return new Response("Method not allowed", { status: 405 });
 };
-
-export const storeTrackerData = async (data: Data) => {
-  const key = ["tracker", String(data.timestamp)];
-  await kv.set(key, data);
-}
 
 export const endpoints: Record<string, EndpointHandler> = {
   "/tracker": trackerHandler,

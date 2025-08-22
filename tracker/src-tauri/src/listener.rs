@@ -8,11 +8,16 @@ use ts_rs::TS;
 #[derive(Serialize, Clone, Debug, Default, TS)]
 #[ts(export, export_to = "../../../api/types/data.d.ts")]
 pub struct Data {
-    pub timestamp: u64,
-    pub keypresses: u64,
-    pub left_clicks: u64,
-    pub right_clicks: u64,
-    pub middle_clicks: u64,
+    // timestamp
+    pub ts: u64,
+    // key presses
+    pub kp: u64,
+    // left clicks
+    pub lc: u64,
+    // right clicks
+    pub rc: u64,
+    // middle clicks
+    pub mc: u64,
 }
 
 pub fn start_listener(data_clone: Arc<Mutex<Data>>) {
@@ -26,11 +31,11 @@ pub fn start_listener(data_clone: Arc<Mutex<Data>>) {
 fn run_listener(event: Event, data_tmp: &Mutex<Data>) {
     let mut data = data_tmp.lock().unwrap();
     match event.event_type {
-        EventType::KeyPress(_) => data.keypresses += 1,
+        EventType::KeyPress(_) => data.kp += 1,
         EventType::ButtonPress(button) => match button {
-            Button::Left => data.left_clicks += 1,
-            Button::Right => data.right_clicks += 1,
-            Button::Middle => data.middle_clicks += 1,
+            Button::Left => data.lc += 1,
+            Button::Right => data.rc += 1,
+            Button::Middle => data.mc += 1,
             _ => (),
         },
         _ => (),
