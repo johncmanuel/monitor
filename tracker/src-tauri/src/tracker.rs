@@ -1,10 +1,10 @@
-use tauri::{Manager, State};
-use std::sync::{Arc, Mutex};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use std::mem;
-use tokio::sync::RwLock;
 use crate::config::Config;
 use crate::listener::Data;
+use std::mem;
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use tauri::{Manager, State};
+use tokio::sync::RwLock;
 
 pub async fn run_tracker(app_handle: tauri::AppHandle) {
     let client = reqwest::Client::new();

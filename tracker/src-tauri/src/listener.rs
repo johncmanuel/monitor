@@ -1,8 +1,8 @@
 use rdev::{listen, Button, Event, EventType};
 use serde::Serialize;
-use ts_rs::TS;
-use std::sync::{Mutex, Arc};
+use std::sync::{Arc, Mutex};
 use std::thread;
+use ts_rs::TS;
 
 // in the future, i'll include more types of events
 #[derive(Serialize, Clone, Debug, Default, TS)]

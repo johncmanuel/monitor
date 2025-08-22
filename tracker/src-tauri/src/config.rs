@@ -1,6 +1,6 @@
+use serde::{Deserialize, Serialize};
 use tauri::State;
 use tokio::sync::RwLock;
-use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 #[derive(Serialize, Deserialize, Clone, Debug, TS)]
@@ -17,7 +17,10 @@ pub async fn get_config(config: State<'_, RwLock<Config>>) -> Result<Config, ()>
 }
 
 #[tauri::command]
-pub async fn update_config(new_config: Config, config: State<'_, RwLock<Config>>) -> Result<(), ()> {
+pub async fn update_config(
+    new_config: Config,
+    config: State<'_, RwLock<Config>>,
+) -> Result<(), ()> {
     let mut config_guard = config.write().await;
     *config_guard = new_config;
     println!("Configuration updated!");

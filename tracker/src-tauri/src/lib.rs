@@ -2,13 +2,12 @@ mod config;
 mod listener;
 mod tracker;
 
+use crate::config::{get_config, update_config, Config};
+use crate::listener::{start_listener, Data};
+use crate::tracker::run_tracker;
 use std::sync::{Arc, Mutex};
 use tauri::async_runtime::spawn;
 use tokio::sync::RwLock;
-use crate::config::{Config, get_config, update_config};
-use crate::listener::{Data, start_listener};
-use crate::tracker::run_tracker;
-
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -20,7 +19,7 @@ pub fn run() {
             let app_handle = app.handle().clone();
             spawn(run_tracker(app_handle));
             start_listener(data_clone);
-          Ok(())
+            Ok(())
         })
         .manage(RwLock::new(Config {
             api_url: "http://localhost:8000/tracker".to_string(),
