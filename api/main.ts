@@ -1,8 +1,7 @@
 import { endpoints } from "./src/endpoints.ts";
-// origins allowed to get data 
+// origins allowed to get data
 // TODO: set cors
-const allowedOrigins = ["https://johncarlomanuel.com/"]
-
+const allowedOrigins = ["https://johncarlomanuel.com/"];
 
 const handler = async (request: Request): Promise<Response> => {
   const url = new URL(request.url);
@@ -11,7 +10,7 @@ const handler = async (request: Request): Promise<Response> => {
     return await endpoint(request);
   }
   return new Response("Not found", { status: 404 });
-}
+};
 
 if (import.meta.main) {
   console.log("Starting server...");

@@ -10,9 +10,22 @@ CSS and Typescript.
   [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) +
   [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
 
-## Commands
+## Set up
 
 deno install 
 deno task tauri android init
 
-For Desktop development, run: deno task tauri dev
+for Desktop development, run: deno task tauri dev
+
+you'll want to set up an api key to authenticate with your api server so only your computers can send your data to your api.
+
+create api key using /utils/keygen.ts (at root) with `deno task keygen`
+
+then use api key in /tracker/.cargo/config.toml (create if haven't already)
+
+```toml
+[env]
+API_KEY="your key here"
+```
+
+in /api, create .env following .env.example and paste in the same api key

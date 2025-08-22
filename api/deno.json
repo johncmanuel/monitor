@@ -1,6 +1,11 @@
 {
   "tasks": {
-    "dev": "deno run --watch -A main.ts"
+    "dev": "deno run --watch -A --env --unstable-kv main.ts",
+    "db:dump": "deno run --allow-read --allow-write --unstable-kv utils/db_dump.ts",
+    "db:reset": "deno run --allow-read --allow-write --unstable-kv utils/db_reset.ts"
+  },
+  "fmt": {
+    "exclude": ["types/"]
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"

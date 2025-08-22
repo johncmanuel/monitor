@@ -19,6 +19,8 @@ impl Config {
             }
         } else {
             Self {
+                // honestly it'll be just me using this app, so set this as default
+                // but can change this if needed
                 api_url: "https://monitor.johncarlomanuel.com/tracker".to_string(),
                 interval_secs: 120,
             }

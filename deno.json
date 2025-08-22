@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "keygen": "deno run ./utils/keygen.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}
