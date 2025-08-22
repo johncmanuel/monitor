@@ -1,63 +1,32 @@
-use rdev::{listen, Button, Event, EventType};
-use serde::{Deserialize, Serialize};
+mod config;
+mod listener;
+
+use rdev::listen;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use std::{mem};
+use std::{mem, thread};
 use tauri::async_runtime::spawn;
 use tauri::{Manager, State};
-use tokio::sync::{RwLock};
-use ts_rs::TS;
+use tokio::sync::RwLock;
+use config::{Config, get_config, update_config};
+use listener::{Data, run_listener};
 
-// in the future, i'll include more types of events
-#[derive(Serialize, Clone, Debug, Default, TS)]
-#[ts(export, export_to = "../../../api/types/data.d.ts")]
-struct Data {
-    timestamp: u64,
-    keypresses: u64,
-    left_clicks: u64,
-    right_clicks: u64,
-    middle_clicks: u64,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, TS)]
-#[ts(export, export_to = "../../src/types/config.d.ts")]
-struct Config {
-    api_url: String,
-    interval_secs: u64,
-}
-
-#[tauri::command]
-async fn get_config(config: State<'_, RwLock<Config>>) -> Result<Config, ()> {
-    let config_guard = config.read().await;
-    Ok(config_guard.clone())
-}
-
-#[tauri::command]
-async fn update_config(new_config: Config, config: State<'_, RwLock<Config>>) -> Result<(), ()> {
-    let mut config_guard = config.write().await;
-    *config_guard = new_config;
-    println!("Configuration updated!");
-    Ok(())
-}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let data = Arc::new(Mutex::new(Data::default()));
     let data_clone = data.clone();
 
-    // create new thread for event listening
-    // thread::spawn(move || {
-    //     listen(move |event| callback(event, &data_clone)).expect("Could not listen to events");
-    // });
-
     tauri::Builder::default()
         .setup(|app| {
             let app_handle = app.handle().clone();
             spawn(run_tracker(app_handle));
-            spawn(async move {
-                listen(move |event| callback(event, &data_clone)).expect("Could not listen to events");
+
+            thread::spawn(move || {
+                listen(move |event| run_listener(event, &data_clone))
+                    .expect("Could not listen to events");
             });
-            Ok(())
+           Ok(())
         })
         .manage(RwLock::new(Config {
             api_url: "http://localhost:8000/tracker".to_string(),
@@ -111,20 +80,6 @@ async fn run_tracker(app_handle: tauri::AppHandle) {
         } else {
             println!("No events in the last {} seconds.", interval);
         }
-    }
-}
-
-fn callback(event: Event, data_tmp: &Mutex<Data>) {
-    let mut data = data_tmp.lock().unwrap();
-    match event.event_type {
-        EventType::KeyPress(_) => data.keypresses += 1,
-        EventType::ButtonPress(button) => match button {
-            Button::Left => data.left_clicks += 1,
-            Button::Right => data.right_clicks += 1,
-            Button::Middle => data.middle_clicks += 1,
-            _ => (),
-        },
-        _ => (),
     }
 }
 
