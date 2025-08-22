@@ -25,9 +25,9 @@ pub fn run() {
             let config = store
                 .get("config")
                 .and_then(|value| serde_json::from_value(value).ok())
-                .unwrap_or_else(|| Config {
-                    api_url: "http://localhost:8000/tracker".to_string(),
-                    interval_secs: 10,
+                .unwrap_or_else(|| {
+                    println!("No valid config found, using default");
+                    Config::default()
                 });
 
             store.close_resource();
