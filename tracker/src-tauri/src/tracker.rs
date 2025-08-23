@@ -11,6 +11,7 @@ pub async fn run_tracker(app_handle: tauri::AppHandle) {
     let config_state: State<RwLock<Config>> = app_handle.state();
     let counter_state: State<Arc<Mutex<Data>>> = app_handle.state();
     let api_key = std::env::var("API_KEY").expect("API_KEY not set");
+    let mut failed_data_cache: Option<Data> = None;
 
     loop {
         let interval = {
@@ -36,25 +37,42 @@ pub async fn run_tracker(app_handle: tauri::AppHandle) {
             + data_snapshot.rc
             + data_snapshot.mc;
 
+       if let Some(previous_data) = failed_data_cache.take() {
+            println!("Merging cached data from a previous failed request.");
+            data_snapshot = data_snapshot + previous_data; 
+        }
+
         if total_events > 0 {
             let url = config_state.read().await.api_url.clone();
-            println!("Sending {} events to {}", total_events, url);
-            send_to_api(&client, data_snapshot, &url, &api_key).await;
+            println!("Sending {} events to {} in the last {} seconds", total_events, url, interval);
+
+            match send_to_api(&client, &data_snapshot, &url, &api_key).await {
+                Ok(_) => {
+                    println!("Data sent successfully.");
+                }
+                Err(e) => {
+                    eprintln!("Error sending data: {}", e);
+                    failed_data_cache = Some(data_snapshot);
+                }
+            }
         } else {
             println!("No events in the last {} seconds.", interval);
         }
     }
 }
 
-async fn send_to_api(client: &reqwest::Client, data: Data, api_url: &str, api_key: &str) {
-    match client.post(api_url).json(&data).header("Authorization", format!("Bearer {}", api_key)).send().await {
-        Ok(resp) => {
-            if resp.status().is_success() {
-                println!("Data sent successfully.");
-            } else {
-                println!("Failed to send data: {}", resp.status());
-            }
-        }
-        Err(e) => println!("Error sending data: {}", e),
-    }
+async fn send_to_api(
+    client: &reqwest::Client,
+    data: &Data,
+    api_url: &str,
+    api_key: &str,
+) -> Result<(), reqwest::Error> {
+    client
+        .post(api_url)
+        .json(data)
+        .header("Authorization", format!("Bearer {}", api_key))
+        .send()
+        .await?
+        .error_for_status()?; 
+    Ok(())
 }

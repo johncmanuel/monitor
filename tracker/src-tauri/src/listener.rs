@@ -1,11 +1,12 @@
 use rdev::{listen, Button, Event, EventType};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use ts_rs::TS;
+use std::ops::Add;
 
 // in the future, i'll include more types of events
-#[derive(Serialize, Clone, Debug, Default, TS)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, TS)]
 #[ts(export, export_to = "../../../api/types/data.d.ts")]
 pub struct Data {
     // timestamp
@@ -18,6 +19,23 @@ pub struct Data {
     pub rc: u64,
     // middle clicks
     pub mc: u64,
+}
+
+// in case error occurs when sending data to api, keep track of unsent entries
+impl Add for Data {
+    type Output = Data;
+
+    fn add(self, other: Data) -> Data {
+        Data {
+            // keep the latest timestamp
+            ts: self.ts.max(other.ts), 
+
+            kp: self.kp + other.kp,
+            lc: self.lc + other.lc,
+            rc: self.rc + other.rc,
+            mc: self.mc + other.mc,
+        }
+    }
 }
 
 pub fn start_listener(data_clone: Arc<Mutex<Data>>) {
