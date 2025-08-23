@@ -2,6 +2,8 @@
 
 keyboard and mouse monitor... in rust! basically a keylogger only for personal use. this sends a number of keypresses and mouse clicks to a server, which my personal website (johncarlomanuel.com) will consume and display on the front page. 
 
+![monitor application window](.github\0.png)
+
 ## Set up
 
 ### Prerequisites
@@ -12,12 +14,12 @@ Install:
 
 ### Tauri application
 
+```
+cd ./tracker
 deno install 
-deno task tauri android init
+```
 
-for desktop development, run: deno task tauri dev
-
-you'll want to set up an api key to authenticate with the server so only authorized computers can send their data to the api.
+then you'll want to set up an api key to authenticate with the server so only authorized computers can send their data to the api.
 
 create api key using `/utils/keygen.ts` (at root) with `deno task keygen`
 
@@ -29,7 +31,7 @@ API_KEY="your key here"
 
 for production, create `.env.production` in the same directory with same format and generate another api key to use using `deno task keygen`
 
-after that, use `deno task tauri dev` to run the application. for production use `deno task tauri build`
+after that, run `deno task tauri dev` to view the application in dev mode. for production use `deno task tauri build`
 
 ### Deno API
 
