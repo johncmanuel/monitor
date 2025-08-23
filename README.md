@@ -2,7 +2,7 @@
 
 keyboard and mouse monitor... in rust! basically a keylogger only for personal use. this sends a number of keypresses and mouse clicks to a server, which my personal website (johncarlomanuel.com) will consume and display on the front page. 
 
-![monitor application window](.github\0.png)
+![monitor application window](.github/0.png)
 
 ## Set up
 
