@@ -14,14 +14,14 @@ impl Config {
     pub fn set_default_config() -> Self {
         if cfg!(debug_assertions) {
             Self {
-                api_url: "http://localhost:8000/tracker".to_string(),
+                api_url: "http://localhost:8000/data".to_string(),
                 interval_secs: 10,
             }
         } else {
             Self {
                 // honestly it'll be just me using this app, so set this as default
                 // but can change this if needed
-                api_url: "https://monitor.johncarlomanuel.com/tracker".to_string(),
+                api_url: "https://monitor.johncarlomanuel.com/data".to_string(),
                 interval_secs: 60,
             }
         }

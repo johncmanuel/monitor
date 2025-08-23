@@ -3,7 +3,7 @@ import { getTrackerData, storeTrackerData } from "../src/kv.ts";
 
 type EndpointHandler = (request: Request) => Promise<Response>;
 
-export const trackerHandler: EndpointHandler = async (request) => {
+export const handler: EndpointHandler = async (request) => {
   if (request.method === "POST") {
     if (
       request.headers.get("Authorization") !==
@@ -27,5 +27,5 @@ export const trackerHandler: EndpointHandler = async (request) => {
 };
 
 export const endpoints: Record<string, EndpointHandler> = {
-  "/tracker": trackerHandler,
+  "/data": handler,
 };
