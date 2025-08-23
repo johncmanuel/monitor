@@ -3,7 +3,7 @@ use crate::listener::Data;
 use std::mem;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use tauri::{Manager, State};
+use tauri::{Emitter, Manager, State};
 use tokio::sync::RwLock;
 
 pub async fn run_tracker(app_handle: tauri::AppHandle) {
@@ -50,9 +50,13 @@ pub async fn run_tracker(app_handle: tauri::AppHandle) {
             match send_to_api(&client, &data_snapshot, &url, &api_key).await {
                 Ok(_) => {
                     println!("Data sent successfully.");
+                    app_handle
+                        .emit("api_success", "Data sent successfully")
+                        .ok();
                 }
                 Err(e) => {
                     eprintln!("Error sending data: {}", e);
+                    app_handle.emit("api_error", e.to_string()).ok();
                     failed_data_cache = Some(data_snapshot);
                 }
             }

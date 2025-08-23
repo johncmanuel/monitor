@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Config } from "./types/config.d.ts";
+import type { Config } from "./types/config.d.ts";
+import { listen } from "@tauri-apps/api/event";
 import { store } from "./store.ts";
 
 const form = document.getElementById("configForm") as HTMLFormElement | null;
@@ -35,7 +36,40 @@ async function loadConfig() {
   }
 }
 
+async function updateConfig(newConfig: Config) {
+  try {
+    await invoke("update_config", { newConfig });
+    store.set("config", newConfig);
+    statusEl!.textContent = "Settings saved successfully!";
+    statusEl!.style.color = "green";
+  } catch (e) {
+    console.error("Error saving config:", e);
+    statusEl!.textContent = "Failed to save settings.";
+    statusEl!.style.color = "red";
+  }
+}
+
 await loadConfig();
+
+function clearStatus(ms: number = 3000) {
+  setTimeout(() => {
+    if (statusEl) {
+      statusEl.textContent = "";
+    }
+  }, ms);
+}
+
+listen<string>("api_error", (event) => {
+  statusEl!.textContent = `API Error: ${event.payload}`;
+  statusEl!.style.color = "red";
+  clearStatus();
+});
+
+listen<string>("api_success", (event) => {
+  statusEl!.textContent = `API Success: ${event.payload}`;
+  statusEl!.style.color = "green";
+  clearStatus();
+});
 
 form!.addEventListener("submit", async (event: SubmitEvent) => {
   event.preventDefault();
@@ -47,20 +81,6 @@ form!.addEventListener("submit", async (event: SubmitEvent) => {
     interval_secs: parseInt(intervalInput!.value, 10) as unknown as bigint,
   };
 
-  try {
-    await invoke("update_config", { newConfig });
-    store.set("config", newConfig);
-    statusEl!.textContent = "Settings saved successfully!";
-    statusEl!.style.color = "green";
-  } catch (e) {
-    console.error("Error saving config:", e);
-    statusEl!.textContent = "Failed to save settings.";
-    statusEl!.style.color = "red";
-  }
-
-  setTimeout(() => {
-    if (statusEl) {
-      statusEl!.textContent = "";
-    }
-  }, 3000);
+  await updateConfig(newConfig);
+  clearStatus();
 });
