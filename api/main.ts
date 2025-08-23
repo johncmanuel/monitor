@@ -10,7 +10,6 @@ const handler = async (request: Request): Promise<Response> => {
 };
 
 if (import.meta.main) {
-  console.log("Starting server...");
   Deno.serve({
     port: 8000,
     handler: (request) => handler(request),

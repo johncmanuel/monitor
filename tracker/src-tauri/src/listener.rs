@@ -1,9 +1,9 @@
 use rdev::{listen, Button, Event, EventType};
 use serde::{Deserialize, Serialize};
+use std::ops::Add;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use ts_rs::TS;
-use std::ops::Add;
 
 // in the future, i'll include more types of events
 #[derive(Serialize, Deserialize, Clone, Debug, Default, TS)]
@@ -28,7 +28,7 @@ impl Add for Data {
     fn add(self, other: Data) -> Data {
         Data {
             // keep the latest timestamp
-            ts: self.ts.max(other.ts), 
+            ts: self.ts.max(other.ts),
 
             kp: self.kp + other.kp,
             lc: self.lc + other.lc,
