@@ -1,7 +1,4 @@
 import { endpoints } from "./src/endpoints.ts";
-// origins allowed to get data
-// TODO: set cors
-const allowedOrigins = ["https://johncarlomanuel.com/"];
 
 const handler = async (request: Request): Promise<Response> => {
   const url = new URL(request.url);
