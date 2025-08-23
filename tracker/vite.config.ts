@@ -27,6 +27,6 @@ export default defineConfig(async () => ({
     },
   },
   build: {
-    target: "es2022"
-  }
+    target: "es2022",
+  },
 }));
