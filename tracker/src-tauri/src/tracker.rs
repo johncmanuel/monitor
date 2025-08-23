@@ -10,7 +10,7 @@ pub async fn run_tracker(app_handle: tauri::AppHandle) {
     let client = reqwest::Client::new();
     let config_state: State<RwLock<Config>> = app_handle.state();
     let counter_state: State<Arc<Mutex<Data>>> = app_handle.state();
-    let api_key = std::env::var("API_KEY").expect("API_KEY not set");
+    let api_key = env!("API_KEY");
     let mut failed_data_cache: Option<Data> = None;
 
     loop {
@@ -38,12 +38,11 @@ pub async fn run_tracker(app_handle: tauri::AppHandle) {
         if let Some(previous_data) = failed_data_cache.take() {
             println!("Merging cached data from a previous failed request.");
             data_snapshot = data_snapshot + previous_data;
-            let merged_total =
-                data_snapshot.kp + data_snapshot.lc + data_snapshot.rc + data_snapshot.mc;
-            println!(
-                "Merged total events including current one with {} events: {}",
-                total_events, merged_total
-            );
+            let merged_total = data_snapshot.kp
+                + data_snapshot.lc
+                + data_snapshot.rc
+                + data_snapshot.mc;
+            println!("Merged total events including current one with {} events: {}", total_events, merged_total);
         }
 
         if total_events > 0 {
@@ -61,10 +60,7 @@ pub async fn run_tracker(app_handle: tauri::AppHandle) {
                         .ok();
                 }
                 Err(e) => {
-                    eprintln!(
-                        "Error sending data: {}, temporarily storing failed data in memory",
-                        e
-                    );
+                    eprintln!("Error sending data: {}, temporarily storing failed data in memory", e);
                     app_handle.emit("api_error", e.to_string()).ok();
                     failed_data_cache = Some(data_snapshot);
                 }

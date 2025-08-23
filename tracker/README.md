@@ -21,10 +21,9 @@ you'll want to set up an api key to authenticate with your api server so only yo
 
 create api key using /utils/keygen.ts (at root) with `deno task keygen`
 
-then use api key in /tracker/.cargo/config.toml (create if haven't already)
+then use api key in /tracker/.env (create if haven't already)
 
-```toml
-[env]
+```
 API_KEY="your key here"
 ```
 

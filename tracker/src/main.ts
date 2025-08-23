@@ -51,7 +51,7 @@ async function updateConfig(newConfig: Config) {
 
 await loadConfig();
 
-function clearStatus(ms: number = 3000) {
+function clearStatus(ms: number = 5000) {
   setTimeout(() => {
     if (statusEl) {
       statusEl.textContent = "";

@@ -2,7 +2,7 @@
 name = "tracker"
 version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
+authors = ["John Carlo Manuel"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -19,13 +19,14 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 incremental = true
 
 [profile.release]
-strip = true
+# strip = true
 codegen-units = 1
 lto = true
 opt-level = 3
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+dotenvy = "0.15.7"
 
 [dependencies]
 tauri = { version = "2", features = [] }
