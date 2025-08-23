@@ -4,6 +4,8 @@ keyboard and mouse monitor... in rust! basically a keylogger only for personal u
 
 ![monitor application window](.github/0.png)
 
+todo: add a video demo
+
 ## Set up
 
 ### Prerequisites
