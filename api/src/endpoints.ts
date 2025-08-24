@@ -1,5 +1,5 @@
 import { Data } from "../types/data.d.ts";
-import { getTrackerData, storeTrackerData } from "../src/kv.ts";
+import {convertToNumber,getTrackerData, storeTrackerData } from "../src/kv.ts";
 
 type EndpointHandler = (request: Request) => Promise<Response>;
 
@@ -21,7 +21,7 @@ export const handler: EndpointHandler = async (request) => {
     console.log("Fetching data");
     const data = await getTrackerData();
     console.log("Fetched data");
-    return new Response(JSON.stringify(data), { status: 200 });
+    return new Response(JSON.stringify(convertToNumber(data)), { status: 200 });
   }
   return new Response("Method not allowed", { status: 405 });
 };
